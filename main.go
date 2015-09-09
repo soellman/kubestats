@@ -33,6 +33,7 @@ func workers() context.CancelFunc {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go scheduler(ctx)
+	go watcher(ctx)
 
 	return cancel
 }
