@@ -51,11 +51,17 @@ func pollRCs() {
 	})
 }
 
-// report endpoint count for a service
+// report endpoint addr count for a service
 func showSvc(svc api.Service) {
 	withKube(func(client *unversioned.Client) error {
+		e := 0
 		eps, err := client.Endpoints(svc.ObjectMeta.Namespace).List(labels.Set(svc.Spec.Selector).AsSelector())
-		gauge(fmt.Sprintf("svc.%s.%s", svc.ObjectMeta.Namespace, svc.ObjectMeta.Name), len(eps.Items))
+		for _, ep := range eps.Items {
+			for _, ss := range ep.Subsets {
+				e = e + len(ss.Addresses)
+			}
+		}
+		gauge(fmt.Sprintf("svc.%s.%s", svc.ObjectMeta.Namespace, svc.ObjectMeta.Name), e)
 		return err
 	})
 }
