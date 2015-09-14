@@ -40,6 +40,7 @@ func workers() context.CancelFunc {
 
 var (
 	debug        bool
+	logEvents    bool
 	statsdAddr   string
 	statsdPrefix string
 	kubeAddr     string
@@ -48,6 +49,7 @@ var (
 
 func parseFlags() {
 	flag.BoolVar(&debug, "debug", false, "debug logging")
+	flag.BoolVar(&logEvents, "logEvents", false, "write abbreviated events to log")
 	flag.StringVar(&statsdAddr, "statsdAddr", "localhost:8125", "statsd address")
 	flag.StringVar(&statsdPrefix, "statsdPrefix", "kubernetes", "statsd prefix")
 	flag.StringVar(&kubeAddr, "kubeAddr", "http://localhost:8080", "kubernetes address")

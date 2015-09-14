@@ -118,16 +118,12 @@ func handleEvent(e *api.Event) {
 		return
 	}
 
-	// Since people care most about failures, let's write it to the log
-	fn := debugf
-	if e.Reason == "failed" {
-		fn = log.Printf
-	} else {
-		fn("Received event: %s %q %s %s/%s", e.Source.Component, e.Reason, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name)
+	if logEvents {
+		count := ""
 		if e.Count > 1 {
-			fn(" (x%d)", e.Count)
+			count = fmt.Sprintf(" (x%d)", e.Count)
 		}
-		fn("  %s\n", strings.TrimSpace(e.Message))
+		log.Printf("Event: %s %q %s %s/%s%s: %s", e.Source.Component, e.Reason, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, count, strings.TrimSpace(e.Message))
 	}
 
 	incr(fmt.Sprintf("event.%s.%s.%s", e.Source.Component, e.InvolvedObject.Kind, e.Reason))
