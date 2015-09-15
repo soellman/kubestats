@@ -126,5 +126,6 @@ func handleEvent(e *api.Event) {
 		log.Printf("Event: %s %q %s %s/%s%s: %s", e.Source.Component, e.Reason, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, count, strings.TrimSpace(e.Message))
 	}
 
-	incr(fmt.Sprintf("event.%s.%s.%s", e.Source.Component, e.InvolvedObject.Kind, e.Reason))
+	incr(fmt.Sprintf("event.component.%s.%s.%s", e.Source.Component, e.InvolvedObject.Kind, e.Reason))
+	incr(fmt.Sprintf("event.namespace.%s", e.ObjectMeta.Namespace))
 }
