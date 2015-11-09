@@ -131,7 +131,11 @@ func pollPods(names map[string]string) {
 			ppn[i.Status.HostIP]++
 		}
 		for ip, p := range ppn {
-			gauge(fmt.Sprintf("nodes.pods.%s", names[ip]), p)
+			if name, ok := names[ip]; ok {
+				gauge(fmt.Sprintf("nodes.pods.%s", name), p)
+			} else {
+				log.Printf("Unknown node ip: %s\n", ip)
+			}
 		}
 		return err
 	})
