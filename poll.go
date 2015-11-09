@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/unversioned"
@@ -90,19 +91,30 @@ func pollNodes() {
 			names[i.Status.Addresses[0].Address] = i.ObjectMeta.Name
 			for _, c := range i.Status.Conditions {
 				if c.Type == "Ready" {
-					key := "unknown"
+					var key string
 					switch c.Status {
 					case "True":
 						key = "ready"
 					case "False":
 						key = "notready"
+					default:
+						key = "notready"
+						log.Printf("Unknown ready status: %s\n", c.Status)
 					}
 					status[key]++
+					continue
 				}
+				log.Printf("Node condition %s: %s\n", c.Type, c.Status)
 			}
 		}
 		for st, num := range status {
 			gauge(fmt.Sprintf("nodes.status.%s", st), num)
+		}
+		// If all nodes are ready, reset the "notready" gauge
+		if ready, ok := status["ready"]; ok {
+			if ready == len(nodes.Items) {
+				gauge("nodes.status.notready", 0)
+			}
 		}
 		pollPods(names)
 		return err
